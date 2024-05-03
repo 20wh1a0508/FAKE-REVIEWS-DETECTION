@@ -1,0 +1,100 @@
+# RANDOM FOREST ALGO
+
+# Train-Test Split
+X_train, X_test, y_train, y_test = train_test_split(df['processed_text'], df['label'], test_size=0.2, random_state=42)
+
+# Create a Pipeline with Vectorizer and Random Forest Classifier
+text_clf = Pipeline([
+    ('vectorizer', CountVectorizer()),
+    ('clf', RandomForestClassifier())
+])
+
+
+
+# Fit the Model and Evaluate
+text_clf.fit(X_train, y_train)
+
+# Predictions
+y_pred = text_clf.predict(X_test)
+
+# Evaluation
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+
+classification_rep = classification_report(y_test, y_pred)
+print("Classification Report:\n", classification_rep)
+
+# Print confusion matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix:\n", conf_matrix)
+sns.heatmap(conf_matrix, annot=True, cmap='RdBu_r')
+
+from sklearn.metrics import roc_curve, auc, f1_score
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Predict probabilities
+y_pred_probs = text_clf.predict_proba(X_test)
+
+
+
+# Plot ROC curve for class 'CG'
+fpr_cg, tpr_cg, _ = roc_curve(y_test == 'CG', y_pred_probs[:, 0], pos_label=True)
+roc_auc_cg = auc(fpr_cg, tpr_cg)
+
+# Plot ROC curve for class 'OR'
+fpr_or, tpr_or, _ = roc_curve(y_test == 'OR', y_pred_probs[:, 1], pos_label=True)
+roc_auc_or = auc(fpr_or, tpr_or)
+
+# Plot ROC curves
+plt.figure(figsize=(8, 6))
+plt.plot(fpr_cg, tpr_cg, color='darkorange', lw=2, label='ROC curve (area = %0.2f) for class CG' % roc_auc_cg)
+plt.plot(fpr_or, tpr_or, color='darkgreen', lw=2, label='ROC curve (area = %0.2f) for class OR' % roc_auc_or)
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc="lower right")
+plt.show()
+
+# Compute F1-score for each class
+f1_scores = f1_score(y_test, y_pred, labels=['CG', 'OR'], average=None)
+
+# Compute micro-average F1-score
+f1_micro = f1_score(y_test, y_pred, average='micro')
+
+# Compute macro-average F1-score
+f1_macro = f1_score(y_test, y_pred, average='macro')
+# # Plot F1-scores
+plt.figure(figsize=(8, 6))
+labels = ['CG', 'OR', 'Micro-Average', 'Macro-Average']
+f1_scores = np.append(f1_scores, [f1_micro, f1_macro])
+plt.bar(labels, f1_scores, color=['blue', 'green', 'orange', 'red'])
+plt.xlabel('Class')
+plt.ylabel('F1-Score')
+plt.title('F1-Scores')
+plt.ylim(0, 1)
+plt.show()
+
+from sklearn.metrics import precision_recall_curve
+import matplotlib.pyplot as plt
+
+# Compute precision and recall for each class
+precision_cg, recall_cg, _ = precision_recall_curve(y_test == 'CG', y_pred_probs[:, 0], pos_label=True)
+precision_or, recall_or, _ = precision_recall_curve(y_test == 'OR', y_pred_probs[:, 1], pos_label=True)
+
+# Plot precision-recall curve for class 'CG'
+plt.figure(figsize=(8, 6))
+plt.plot(recall_cg, precision_cg, color='blue', lw=2, label='Precision-Recall curve for class CG')
+
+# Plot precision-recall curve for class 'OR'
+plt.plot(recall_or, precision_or, color='green', lw=2, label='Precision-Recall curve for class OR')
+
+# Add labels and title
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall Curve')
+plt.legend(loc="lower left")
+plt.show()
