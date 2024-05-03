@@ -1,0 +1,83 @@
+import time
+import pandas as pd
+import numpy as np
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
+import matplotlib.pyplot as plt
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import classification_report
+
+pd.set_option('max_colwidth', None)
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+%matplotlib inline
+import warnings
+warnings.filterwarnings('ignore')
+from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split
+import string, nltk
+from nltk import word_tokenize
+from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+nltk.download('wordnet')
+
+nltk.download('omw-1.4')
+
+df = pd.read_csv('/content/fake reviews data.csv')
+df.head()
+
+import nltk
+nltk.download('stopwords')
+
+df.isnull().sum()
+
+df.info()
+
+df.describe()
+
+
+df.shape
+
+df['rating'].value_counts()
+
+plt.figure(figsize=(15,8))
+labels = df['rating'].value_counts().keys()
+values = df['rating'].value_counts().values
+explode = (0.1,0,0,0,0)
+plt.pie(values,labels=labels,explode=explode,shadow=True,autopct='%1.1f%%')
+plt.title('Proportion of each rating',fontweight='bold',fontsize=25,pad=20,color='crimson')
+plt.show()
+
+df['label'].value_counts()
+
+df = pd.read_csv('/content/fake reviews data.csv', names=['category', 'rating', 'label', 'text'])
+df['text'] = df['text'].str.replace('\n', ' ')
+df['target'] = np.where(df['label']=='CG', 1, 0)
+
+Target_counts = df['target'].value_counts()
+print(Target_counts)
+
+import matplotlib.pyplot as plt
+plt.figure(figsize=(8, 6))
+Target_counts.plot(kind='bar', color='skyblue')
+plt.title('Class Label Counts')
+plt.xlabel('Class Label')
+plt.ylabel('Count')
+plt.show()
+
+
+
